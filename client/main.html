@@ -1,0 +1,22 @@
+<head>
+  <title>pixinsta</title>
+</head>
+
+<body>
+  <h1>Welcome to Meteor!</h1>
+
+  {{> generate}}
+</body>
+
+<template name="generate">
+  <input type="text" id="search" />
+  <button class="load">Click Me</button>
+  {{#each photos}}
+    {{> photo}}
+  {{/each}}
+  <button class="load-more">Load More</button>
+</template>
+
+<template name="photo">
+  <img src="{{images.standard_resolution.url}}" alt="" class="img-photo">
+</template>

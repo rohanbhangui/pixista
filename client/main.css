@@ -1,0 +1,11 @@
+/* CSS declarations go here */
+
+
+button {
+	display: block;
+}
+
+.img-photo {
+	width: 320px;
+	height: 320px;
+}
