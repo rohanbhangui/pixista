@@ -9,3 +9,24 @@ button {
 	width: 320px;
 	height: 320px;
 }
+
+.start, .end, .current {
+	position: fixed;
+	right: 0;
+}
+
+.start {
+	top: 10px;
+}
+
+.end {
+	top: 30px;
+}
+
+.current {
+	 top: 60px;
+}
+
+.photo-container {
+	display: block;
+}

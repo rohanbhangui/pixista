@@ -11,12 +11,18 @@
 <template name="generate">
   <input type="text" id="search" />
   <button class="load">Click Me</button>
+  <div class="start">start time: 1476748800</div>
+  <div class="end">end time: 1477007999</div>
+  <div class="current">current time: {{currentTime}}</div>
   {{#each photos}}
-    {{> photo}}
+    <div class="photo-container">
+      {{> photo}}
+    </div>
   {{/each}}
   <button class="load-more">Load More</button>
 </template>
 
 <template name="photo">
   <img src="{{images.standard_resolution.url}}" alt="" class="img-photo">
+  <span>{{formattedDate created_time}} - {{created_time}}</span>
 </template>

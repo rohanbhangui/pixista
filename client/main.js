@@ -17,6 +17,9 @@ Template.generate.helpers({
     //return Template.instance().photos.get();
     return Session.get("photos");
   },
+  currentTime() {
+  	return moment().utc().unix();
+  }
 });
 
 Template.generate.events({
@@ -39,12 +42,16 @@ Template.generate.events({
   		var endDate = 1477007999;
   		Meteor.call('getPhotos', tag, url, startDate, endDate, function(error, results) {
 
+  			console.log(results);
+
   			var arr = Session.get("photos");
   			var resultsData = results.data;
 
-  			console.log(resultsData);
+  			
 
   			results.data = arr.concat(resultsData);
+
+  			results.data.sort(compare);
 
 
   			Session.set("photos", results.data);
@@ -59,3 +66,20 @@ Template.generate.events({
   	}
   }
 });
+
+Template.photo.helpers({
+	formattedDate: function(date) {
+		console.log(typeof date);
+		console.log(date);
+		return moment.unix(date).format("MM/DD/YYYY HH:mm");
+	}
+});
+
+function compare(a,b) {
+  if (a.created_time > b.created_time)
+    return -1;
+  if (a.created_time < b.created_time)
+    return 1;
+  return 0;
+}
+
