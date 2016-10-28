@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 
-// Photos = new Mongo.Collection('photos');
+Photos = new Mongo.Collection('photos');
+Links = new Mongo.Collection("links");
 
 var url = "";
 
@@ -14,9 +15,8 @@ Meteor.publish("photosSearch", function(tag, startDate, endDate, refreshed) {
 
   const ACCESS_TOKEN = "272855367.b6f7db4.27aee70b486a4fd7b1b5546c1da0453d";
 
-  //1419042980.973e78a.1ae65a1728724b8a89bd2d616f18d955
   console.log("starting url: " + url);
-  if (url == "" || refreshed) {
+  if (url == "" || refreshed || url.indexOf(tag) == -1) {
       // the variable is defined
       url = "http://api.instagram.com/v1/tags/" + tag + "/media/recent?access_token=" + ACCESS_TOKEN;
   }
@@ -63,8 +63,6 @@ Meteor.publish("photosSearch", function(tag, startDate, endDate, refreshed) {
 
       url = parsedResponse.pagination.next_url;
 
-      // console.log("this is the set url: " + url);
-
       self.ready();
 
     }
@@ -72,6 +70,47 @@ Meteor.publish("photosSearch", function(tag, startDate, endDate, refreshed) {
       console.log("this is the " + counter + " error: ");
       console.log(error);
     }
+  }
+});
+
+Meteor.methods({
+  "writeToDB": function(tag, array, startDate, endDate) {
+
+    var itemsInserted = 0;
+
+    var collectionUniqueID = Random.id();
+
+    array.forEach(function(photoObj) {
+      console.log("matched photos:" + Photos.find({id: photoObj.id}).fetch().length);
+
+      var dbEntry = Photos.find({id: photoObj.id}).fetch();
+      console.log(dbEntry);
+      if(dbEntry.length == 0){
+        photoObj["collectionUniqueID"] = [];
+        //photoObj["collectionUniqueID"].push(collectionUniqueID);
+        Photos.insert(photoObj);
+        itemsInserted++;
+      }
+
+      if(Photos.find({id: photoObj.id, collectionUniqueID: collectionUniqueID}).fetch().length == 0) {
+        Photos.update(
+          {id: photoObj.id},
+          {$push: {collectionUniqueID: collectionUniqueID}}
+        );
+      }
+      
+      
+    });
+
+    if(itemsInserted != 0) {
+
+      var entry = Links.findOne({name: tag, startDate: startDate, endDate: endDate})
+      if(!entry){
+        Links.insert({name: tag, startDate: startDate, endDate: endDate, unique_id: collectionUniqueID });
+      }
+    }
+
+    return collectionUniqueID;
   }
 });
 

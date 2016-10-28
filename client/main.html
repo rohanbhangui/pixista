@@ -4,12 +4,14 @@
 
 <body>
   <h1>Welcome to Meteor!</h1>
-
+  {{> collections}}
+  <br>
   {{> generate}}
 </body>
 
 <template name="generate">
   <input type="text" id="search" />
+  <button class="save" {{checkloadedCollection}}>Save Collection</button>
   <button class="load">Click Me</button>
   <div class="start">start time: 1476748800</div>
   <div class="end">end time: 1477007999</div>
@@ -20,7 +22,7 @@
       {{> photo}}
     </div>
   {{/each}}
-  <button class="load-more">Load More</button>
+  <button class="load-more" {{checkloadedCollection}}>Load More</button>
 </template>
 
 <template name="photo">
@@ -28,4 +30,10 @@
   <span>{{formattedDate created_time}} - {{created_time}}</span>
   <br>
   <span>{{id}} - {{comments.count}}</span>
+</template>
+
+<template name="collections">
+  {{#each links}}
+    <a href="#" key="{{name}}" unique-id="{{unique_id}}" class="collection-link">#{{name}}</a>
+  {{/each}}
 </template>
