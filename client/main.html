@@ -14,6 +14,7 @@
   <div class="start">start time: 1476748800</div>
   <div class="end">end time: 1477007999</div>
   <div class="current">current time: {{currentTime}}</div>
+  <div class="loading">loading: {{searching}}</div>
   {{#each photos}}
     <div class="photo-container">
       {{> photo}}
@@ -25,4 +26,6 @@
 <template name="photo">
   <img src="{{images.standard_resolution.url}}" alt="" class="img-photo">
   <span>{{formattedDate created_time}} - {{created_time}}</span>
+  <br>
+  <span>{{id}} - {{comments.count}}</span>
 </template>

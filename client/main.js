@@ -4,82 +4,82 @@ import { Session } from 'meteor/session';
 
 import './main.html';
 
-Session.setDefault("photos", []);
-Session.setDefault("nextURL", "");
-var tag = "";
+Photos = new Mongo.Collection('photos');
+
+
+var END_DATE = moment().unix();
+var START_DATE = END_DATE - (2 * 24 * 60 * 60);
+
+Session.setDefault("tag", "");
+Session.setDefault('searching', false);
+Session.setDefault("refreshed", true);
 
 Template.generate.onCreated(function() {
   //this.photos = new ReactiveVar([]);
 });
 
+// Tracker.autorun(function() {
+//   if (Session.get('tag')) {
+    
+//   }
+// });
+
 Template.generate.helpers({
-  photos() {
-    //return Template.instance().photos.get();
-    return Session.get("photos");
-  },
   currentTime() {
-  	return moment().utc().unix();
+    return moment().utc().unix();
+  },
+  photos: function() {
+
+    
+    //return Photos.find({created_time: {$gte: START_DATE, $lte: END_DATE}});
+    return Photos.find();
+  },
+  searching: function() {
+    return Session.get("searching");
   }
 });
 
 Template.generate.events({
-	'input #search': function(event, template) {
-		// Session.set("tag", $("#search").val());
+  'input #search': function(event, template) {
+    // Session.set("tag", $("#search").val());
 
-		// console.log(Session.get("tag"));
-
-		tag = $("#search").val();
-		console.log(tag);
-	},
-  'click button': function(event, instance) {
-
-  	console.log($("#search").val());
-
-  	if(tag != "" && tag != null) {
-  		tag = $("#search").val();
-  		var url = Session.get("nextURL");
-  		var startDate = 1476748800;
-  		var endDate = 1477007999;
-  		Meteor.call('getPhotos', tag, url, startDate, endDate, function(error, results) {
-
-  			console.log(results);
-
-  			var arr = Session.get("photos");
-  			var resultsData = results.data;
-
-  			
-
-  			results.data = arr.concat(resultsData);
-
-  			results.data.sort(compare);
+    // console.log(Session.get("tag"));
 
 
-  			Session.set("photos", results.data);
-  			Session.set("nextURL", results.pagination.next_url);
-  			console.log(Session.get("nextURL"));
-  		});
-  	}
-  	else {
+  },
+  'click .load': function(event, template) {
 
-  		alert("input tag invalid");
-  		
-  	}
+
+
+    var tag = template.$("#search").val();
+
+    if(tag) {
+      Session.set("tag", tag);
+
+
+    }
+
+    var searchHandle = Meteor.subscribe('photosSearch', Session.get('tag'), START_DATE, END_DATE, Session.get("refreshed"));
+    Session.set('searching', ! searchHandle.ready());
+    Session.set("refreshed", false);
+
+
+
+    Session.set("refreshed", false);
+  },
+  'click .load-more': function(event, template) {
+    var searchHandle = Meteor.subscribe('photosSearch', Session.get('tag'), START_DATE, END_DATE, Session.get("refreshed"));
+    Session.set('searching', ! searchHandle.ready());
+    Session.set("refreshed", false);
+
   }
 });
 
 Template.photo.helpers({
-	formattedDate: function(date) {
-		console.log(typeof date);
-		console.log(date);
-		return moment.unix(date).format("MM/DD/YYYY HH:mm");
-	}
+  formattedDate: function(date) {
+    console.log(typeof date);
+    console.log(date);
+    return moment.unix(date).format("MM/DD/YYYY HH:mm");
+  }
 });
-
-function compare(a,b) {
-  if (a.created_time > b.created_time)
-    return -1;
-  if (a.created_time < b.created_time)
-    return 1;
-  return 0;
-}
 

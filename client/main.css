@@ -10,7 +10,7 @@ button {
 	height: 320px;
 }
 
-.start, .end, .current {
+.start, .end, .current, .loading {
 	position: fixed;
 	right: 0;
 }
@@ -25,6 +25,10 @@ button {
 
 .current {
 	 top: 60px;
+}
+
+.loading {
+	top: 90px;
 }
 
 .photo-container {
