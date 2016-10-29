@@ -7,7 +7,6 @@ var url = "";
 
 
 Meteor.startup(() => {
-  //url = "";
 });
 
 //takes in a string that is a tag
@@ -15,7 +14,8 @@ Meteor.publish("photosSearch", function(tag, startDate, endDate, refreshed) {
 
   const ACCESS_TOKEN = "272855367.b6f7db4.27aee70b486a4fd7b1b5546c1da0453d";
 
-  console.log("starting url: " + url);
+
+  //if url has not been set inside server yet, set it
   if (url == "" || refreshed || url.indexOf(tag) == -1) {
       // the variable is defined
       url = "http://api.instagram.com/v1/tags/" + tag + "/media/recent?access_token=" + ACCESS_TOKEN;
@@ -36,7 +36,15 @@ Meteor.publish("photosSearch", function(tag, startDate, endDate, refreshed) {
       var parsedResponse = JSON.parse(response.content);
       
       parsedResponse.data.forEach( function(item) {
-        // console.log(item);
+        
+        /*NOTE: this code has been comment out because it is not needed necessarily
+
+        through my research (undocumented) I was able to find that instagram returns images that might not have been captioned with the particular tag but have been commented on by the photo owner with the tag
+
+        the below code is to demonstrate the ability to check for through the comments should the situation arise where a secondary check is needed 
+        
+        */ 
+
 
         //check if comment from poster contains tag
         // if(item.caption.text.indexOf("#" + tag) == -1) {
@@ -61,8 +69,10 @@ Meteor.publish("photosSearch", function(tag, startDate, endDate, refreshed) {
         }
       });
 
+      //set the next rul for the next set of images
       url = parsedResponse.pagination.next_url;
 
+      //tell the subscribe function on the client that the server is ready to send the images that are ready
       self.ready();
 
     }
@@ -74,15 +84,20 @@ Meteor.publish("photosSearch", function(tag, startDate, endDate, refreshed) {
 });
 
 Meteor.methods({
+
+  //for the write to DB functionality
   "writeToDB": function(tag, array, startDate, endDate) {
 
     var itemsInserted = 0;
 
     var collectionUniqueID = Random.id();
 
+
+    //checking each item if in the DB
     array.forEach(function(photoObj) {
       console.log("matched photos:" + Photos.find({id: photoObj.id}).fetch().length);
 
+      //if not in the DB create a collection id parameter, add it to the photo object and insert into DB
       var dbEntry = Photos.find({id: photoObj.id}).fetch();
       console.log(dbEntry);
       if(dbEntry.length == 0){
@@ -92,7 +107,7 @@ Meteor.methods({
         itemsInserted++;
       }
 
-      //to eliminate duplicate ID adds
+      //adds the collection ID for later retrieval
       if(Photos.find({id: photoObj.id, collectionUniqueID: collectionUniqueID}).fetch().length == 0) {
         Photos.update(
           {id: photoObj.id},
@@ -103,6 +118,7 @@ Meteor.methods({
       
     });
 
+    //checks for collection and updates the collections Lists to reflect the newly added list
     if(itemsInserted != 0) {
 
       var entry = Links.findOne({name: tag, startDate: startDate, endDate: endDate, unique_id: collectionUniqueID})
@@ -114,6 +130,7 @@ Meteor.methods({
     //reset base url on save 
     url = "";
 
+    //return the collectionUniqueID in order for the template helper on the client side to sort and render the photos
     return collectionUniqueID;
   }
 });
