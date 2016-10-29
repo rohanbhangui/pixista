@@ -28,7 +28,7 @@ Meteor.publish("photosSearch", function(tag, startDate, endDate, refreshed) {
 
   while(counter <= 5) {
 
-    
+    console.log("current url: " + url);
 
     try {
 
@@ -92,6 +92,7 @@ Meteor.methods({
         itemsInserted++;
       }
 
+      //to eliminate duplicate ID adds
       if(Photos.find({id: photoObj.id, collectionUniqueID: collectionUniqueID}).fetch().length == 0) {
         Photos.update(
           {id: photoObj.id},
@@ -104,11 +105,14 @@ Meteor.methods({
 
     if(itemsInserted != 0) {
 
-      var entry = Links.findOne({name: tag, startDate: startDate, endDate: endDate})
+      var entry = Links.findOne({name: tag, startDate: startDate, endDate: endDate, unique_id: collectionUniqueID})
       if(!entry){
         Links.insert({name: tag, startDate: startDate, endDate: endDate, unique_id: collectionUniqueID });
       }
     }
+
+    //reset base url on save 
+    url = "";
 
     return collectionUniqueID;
   }

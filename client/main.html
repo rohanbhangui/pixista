@@ -3,33 +3,85 @@
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
-  {{> collections}}
-  <br>
+  
   {{> generate}}
 </body>
 
 <template name="generate">
-  <input type="text" id="search" />
-  <button class="save" {{checkloadedCollection}}>Save Collection</button>
-  <button class="load">Click Me</button>
-  <div class="start">start time: 1476748800</div>
-  <div class="end">end time: 1477007999</div>
-  <div class="current">current time: {{currentTime}}</div>
-  <div class="loading">loading: {{searching}}</div>
-  {{#each photos}}
-    <div class="photo-container">
-      {{> photo}}
+  <div class="container-fluid main-container">
+    <div class="row main-row no-gutters">
+      <div class="col-xs-12 col-sm-3">
+        <h1>Pixinsta!</h1>
+        <form class="form-inline photos-search">
+          <div class="form-group">
+            <label class="sr-only" for="tagName">Tag to search</label>
+            <div class="input-group">
+              <div class="input-group-addon">#</div>
+              <input type="text" class="form-control" id="tagName" placeholder="eg. toronto, food, etc.">
+            </div>
+          </div>
+          <br><br>
+          <div class="form-group">
+            <div class="input-group datetimepicker start-date">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+              <input class="set-due-date form-control" id="startDate" type="text" placeholder="Search Start Date"/>
+            </div>
+          </div>
+          <br><br>
+          <div class="form-group">
+            <div class="input-group datetimepicker end-date">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+              <input class="set-due-date form-control" id="endDate" type="text" placeholder="Search End Date"/>
+            </div>
+          </div>
+          <br><br>
+          <button type="submit" class="btn btn-primary">Find Photos!</button>
+        </form>
+        <br>
+        <button class="save btn btn-success" {{checkloadedCollection}}>
+          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+          Save Collection
+        </button>
+        <br><br>
+        
+        <br>
+        <h3>Collections</h3>
+        <br>
+        {{> collections}}
+      </div>
+      <div class="col-xs-12 col-sm-9 height-100">
+        <h1 class="tagTitle">{{currentTag}}</h1>
+        <div class="photos-container">
+          <div class="row no-gutters">
+            {{#each photos}}
+              <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="photo-container">
+                  {{> photo}}
+                </div>
+              </div>
+            {{/each}}
+            <div class="col-xs-12" style="margin-top: 40px; text-align: center;">
+              <button class="load-more btn btn-default {{hidden}}" {{checkloadedCollection}}>Load More</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  {{/each}}
-  <button class="load-more" {{checkloadedCollection}}>Load More</button>
+  </div>
 </template>
 
 <template name="photo">
-  <img src="{{images.standard_resolution.url}}" alt="" class="img-photo">
-  <span>{{formattedDate created_time}} - {{created_time}}</span>
+  <a href="{{link}}" class="block">
+    <div class="overlay">
+      <div class="content">
+        <h5 class="username"><img src="{{user.profile_picture}}" alt="" class="profile-picture">{{user.username}}</h5>
+      </div>
+    </div>
+    <img src="{{images.standard_resolution.url}}" alt="" class="img-photo">
+  </a>
+<!--   <span>{{formattedDate created_time}} - {{created_time}}</span>
   <br>
-  <span>{{id}} - {{comments.count}}</span>
+  <span>{{id}} - {{comments.count}}</span> -->
 </template>
 
 <template name="collections">

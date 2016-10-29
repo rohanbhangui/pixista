@@ -4,30 +4,38 @@ import { Session } from 'meteor/session';
 
 import './main.html';
 
+
+//client side, minimongo links to their server counterparts
 Photos = new Mongo.Collection('photos');
 Links = new Mongo.Collection("links");
 
 
-var END_DATE = moment().unix();
-var START_DATE = END_DATE - (2 * 24 * 60 * 60);
+var END_DATE = 0;
+var START_DATE = 0;
 
+
+//for the tag variable
 Session.setDefault("tag", "");
+
+//when the app is searching for photos
 Session.setDefault('searching', false);
+
+//to indicate that the client/server has refreshed and previous stored data can be released (ie. urls)
 Session.setDefault("refreshed", true);
 
 //to disable certain inputs when collection is loaded
 Session.setDefault("loadedCollection", "");
 Session.setDefault("collectionUniqueID", null);
 
+//hiding the loadmore button if a collection is not being searched
+Session.setDefault("disabledLoadMore", "hidden");
+
+//reactive var for showing the big title overlay on top of images
 Template.generate.onCreated(function() {
-  //this.args = new ReactiveVar();
+  this.tagName = new ReactiveVar("");
 });
 
-// Tracker.autorun(function() {
-//   if (Session.get('tag')) {
-    
-//   }
-// });
+
 
 Template.collections.helpers({
   links() {
@@ -35,15 +43,28 @@ Template.collections.helpers({
   }
 });
 
-Template.collections.events({
-  'click .collection-link': function(event, template) {
-    Session.set("loadedCollection", "disabled");
-    Session.set("tag", $(event.target).attr('key'));
+Template.generate.onRendered(function() {
+    this.$('.datetimepicker.start-date').datetimepicker({
+      format: 'MM/DD/YYYY',
+      dayViewHeaderFormat: 'MMMM YYYY',
+      minDate: moment("01/01/1970", "MM/DD/YYYY"),
+      maxDate: moment(moment(), "MM/DD/YYYY"),
+      showTodayButton: true,
+      defaultDate: moment().subtract(2, 'days').format("MM/DD/YYYY")
 
-    var clickedLinkEntry = Links.findOne({unique_id: $(event.target).attr('unique-id')});
-    Session.set("collectionUniqueID", $(event.target).attr('unique-id'));
-  }
+    });
+
+    this.$('.datetimepicker.end-date').datetimepicker({
+      format: 'MM/DD/YYYY',
+      dayViewHeaderFormat: 'MMMM YYYY',
+      minDate: moment("01/01/1970", "MM/DD/YYYY"),
+      maxDate: moment(moment(), "MM/DD/YYYY"),
+      showTodayButton: true,
+      defaultDate: moment().format("MM/DD/YYYY")
+
+    });
 });
+
 
 Template.generate.helpers({
   currentTime() {
@@ -60,36 +81,72 @@ Template.generate.helpers({
   },
   checkloadedCollection() {
     return Session.get("loadedCollection");
+  },
+  currentTag() {
+
+    if(Template.instance().tagName.get() == undefined) {
+      return "";
+    }
+    else {
+      return Template.instance().tagName.get();
+    }
+  },
+  hidden() {
+    console.log($(".photos-container").find("img").length);
+    if($(".photos-container").find("img").length != 0) {
+      Session.set("disabledLoadMore", "hidden");
+    }
+
+    return Session.get("disabledLoadMore");
   }
 });
 
 Template.generate.events({
-  'input #search': function(event, template) {
-    // Session.set("tag", $("#search").val());
+  'click .collection-link': function(event, template) {
 
-    // console.log(Session.get("tag"));
+    Session.set("loadedCollection", "disabled");
+    Session.set("tag", $(event.target).attr('key'));
 
+    template.tagName.set("#" + Session.get("tag"));
 
+    var clickedLinkEntry = Links.findOne({unique_id: $(event.target).attr('unique-id')});
+    Session.set("collectionUniqueID", $(event.target).attr('unique-id'));
   },
-  'click .load': function(event, template) {
+  'input #tagName': function(event, template) {
+    template.tagName.set("#" + $("#tagName").val());
+    // console.log(Session.get("tag"));
+  },
+  'submit .photos-search': function(event, template) {
+    event.preventDefault();
+
+    var tag = template.$("#tagName").val();
 
 
+    if(tag != "") {
 
-    if($("#search").val() != "") {
+      Session.set("disabledLoadMore", "");
 
       Session.set("collectionUniqueID", null);
 
       Session.set("loadedCollection", "");
 
-      var tag = template.$("#search").val();
-
       if(tag != Session.get("tag")) {
         Session.set("tag", tag);
       }
 
+      console.log($("#startDate").val() + "," + $("#endDate").val());
+
+      START_DATE = moment($("#startDate").val()).unix();
+      END_DATE = moment($("#endDate").val()).unix();
+
+      console.log(START_DATE + "," + END_DATE);
+
       var searchHandle = Meteor.subscribe('photosSearch', Session.get('tag'), START_DATE, END_DATE, Session.get("refreshed"));
       Session.set('searching', ! searchHandle.ready());
       Session.set("refreshed", false);
+    }
+    else {
+      alert("Invalid submission");
     }
   },
   'click .load-more': function(event, template) {
