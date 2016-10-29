@@ -1,0 +1,27 @@
+------------
+Installation
+------------
+
+1. go to https://www.meteor.com/install, select OS instructions and install meteor
+2. git clone this project
+3. use terminal to navigate to the folder
+4. run 'meteor' in the terminal window
+5. App is ready to go :)
+
+
+
+------------
+Summary
+------------
+Frontend:
+  - Created a connection to the Instagram API and searched for media using a user inputted tag and search start and end dates
+  - Used two way data bindings to create a more responsive app
+  - Simple design to navigate results
+  - Retrieve collection of photos saved
+
+Backend: 
+  - Used HTTP GETS to retrieve instagram photos
+  - Used Mongo collections to store data and used for creating DB local (cached) connections
+  - Created functions to save photos to a collection and retrieve that collection later
+
+  

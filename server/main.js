@@ -1,5 +1,17 @@
 import { Meteor } from 'meteor/meteor';
 
+
+/* DB STRUCTURE:
+
+The DB is based on a two-tier, collection struture: Photos and Links
+
+Photos: stores all photos saved by the user (seperates them using a CollectionUniqueID)
+
+Links: Contain records that point to a set of photos that can be retrieved using the CollectionUniqueID in the Photos collection
+
+
+
+*/
 Photos = new Mongo.Collection('photos');
 Links = new Mongo.Collection("links");
 
