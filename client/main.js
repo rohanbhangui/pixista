@@ -84,7 +84,7 @@ Template.generate.helpers({
   //return the photos based on a collection ID and tag name
   photos: function() {
     return Photos.find({
-      tags: Session.get("tag"),
+      tags: Template.instance().tagName.get(),
       collectionUniqueID: Session.get("collectionUniqueID")
     });
   },
@@ -102,11 +102,13 @@ Template.generate.helpers({
   //show the current tag when typing
   currentTag() {
 
-    if(Template.instance().tagName.get() == undefined) {
+    console.log(Template.instance().tagName.get());
+
+    if(Template.instance().tagName.get() == "") {
       return "";
     }
     else {
-      return Template.instance().tagName.get();
+      return "#" + Template.instance().tagName.get();
     }
   },
 
@@ -127,9 +129,9 @@ Template.generate.events({
   'click .collection-link': function(event, template) {
 
     Session.set("loadedCollection", "disabled");
-    Session.set("tag", $(event.target).attr('key'));
+    template.tagName.set($(event.target).attr('key'));
 
-    template.tagName.set("#" + Session.get("tag"));
+    // template.tagName.set("#" + Template.instance().tagName.get());
 
     var clickedLinkEntry = Links.findOne({unique_id: $(event.target).attr('unique-id')});
     Session.set("collectionUniqueID", $(event.target).attr('unique-id'));
@@ -137,7 +139,7 @@ Template.generate.events({
 
   //get tag name
   'input #tagName': function(event, template) {
-    template.tagName.set("#" + $("#tagName").val());
+    template.tagName.set($("#tagName").val());
   },
 
   // when searching for photos
@@ -157,8 +159,8 @@ Template.generate.events({
       Session.set("loadedCollection", "");
 
       //if the tag is not the same as last when it was set
-      if(tag != Session.get("tag")) {
-        Session.set("tag", tag);
+      if(tag != template.tagName.get()) {
+        template.tagName.set(tag);
       }
 
       //grab the end date and start date from the date pickers & convert to unix timestamps (UTC)
@@ -166,7 +168,7 @@ Template.generate.events({
       END_DATE = moment($("#endDate").val()).endOf('day').utc().unix();
 
       //meteor subscribe function to subscribe a publish from the server
-      var searchHandle = Meteor.subscribe('photosSearch', Session.get('tag'), START_DATE, END_DATE, Session.get("refreshed"));
+      var searchHandle = Meteor.subscribe('photosSearch', template.tagName.get(), START_DATE, END_DATE, Session.get("refreshed"));
       Session.set('searching', ! searchHandle.ready());
       Session.set("refreshed", false);
     }
@@ -179,7 +181,7 @@ Template.generate.events({
 
   //if load more button is clicked make a subscribe call and get new photos
   'click .load-more': function(event, template) {
-    var searchHandle = Meteor.subscribe('photosSearch', Session.get('tag'), START_DATE, END_DATE, Session.get("refreshed"));
+    var searchHandle = Meteor.subscribe('photosSearch', template.tagName.get(), START_DATE, END_DATE, Session.get("refreshed"));
     Session.set('searching', ! searchHandle.ready());
     Session.set("refreshed", false);
 
@@ -189,11 +191,11 @@ Template.generate.events({
   'click .save': function(event, template) {
 
     var photosLocalArr = Photos.find({
-      tags: Session.get("tag")
+      tags: template.tagName.get()
     }).fetch();
 
     //console.log(foo);
-    Meteor.call("writeToDB", Session.get("tag"), photosLocalArr, START_DATE, END_DATE, function(error, results) {
+    Meteor.call("writeToDB", template.tagName.get(), photosLocalArr, START_DATE, END_DATE, function(error, results) {
       if(error) {
         console.log("insert error: " + error);
       }
