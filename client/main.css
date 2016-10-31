@@ -130,3 +130,17 @@ h1.tagTitle {
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.11);
 	margin-right: 10px;
 }
+
+.play-video.glyphicon-play {
+	font-size: 100px;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	-webkit-transform: translateX(-50%) translateY(-50%);
+	-moz-transform: translateX(-50%) translateY(-50%);
+	-ms-transform: translateX(-50%) translateY(-50%);
+	-o-transform: translateX(-50%) translateY(-50%);
+	transform: translateX(-50%) translateY(-50%);
+	color: white;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.11);
+}

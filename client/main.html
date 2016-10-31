@@ -35,7 +35,7 @@
             </div>
           </div>
           <br><br>
-          <button type="submit" class="btn btn-primary">Find Photos!</button>
+          <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-search"></i> Find Photos!</button>
         </form>
         <br>
         <button class="save btn btn-success" {{checkloadedCollection}}>
@@ -75,6 +75,9 @@
     <div class="overlay">
       <div class="content">
         <h5 class="username"><img src="{{user.profile_picture}}" alt="" class="profile-picture">{{user.username}}</h5>
+        {{#if isVideo type }}
+          <i class="glyphicon glyphicon-play play-video"></i>
+        {{/if}}
       </div>
     </div>
     <img src="{{images.standard_resolution.url}}" alt="" class="img-photo">

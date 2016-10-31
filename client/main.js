@@ -43,6 +43,18 @@ Template.collections.helpers({
   }
 });
 
+Template.photo.helpers({
+  isVideo: function(arg) {
+    if(arg == "video") {
+      console.log("this is a video");
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+}); 
+
 
 //init 2 datepickers
 Template.generate.onRendered(function() {
@@ -150,8 +162,8 @@ Template.generate.events({
       }
 
       //grab the end date and start date from the date pickers & convert to unix timestamps (UTC)
-      START_DATE = moment($("#startDate").val()).unix();
-      END_DATE = moment($("#endDate").val()).unix();
+      START_DATE = moment($("#startDate").val()).startOf('day').utc().unix();
+      END_DATE = moment($("#endDate").val()).endOf('day').utc().unix();
 
       //meteor subscribe function to subscribe a publish from the server
       var searchHandle = Meteor.subscribe('photosSearch', Session.get('tag'), START_DATE, END_DATE, Session.get("refreshed"));
