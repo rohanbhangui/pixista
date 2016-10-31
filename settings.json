@@ -1,0 +1,8 @@
+{
+  "galaxy.meteor.com": { 
+     "env": { 
+       "ROOT_URL": "pixinsta.meteorapp.com",
+       "MONGO_URL": " mongodb://rohanbhangui:admin1234567890@ds139267.mlab.com:39267/pixinsta" 
+     } 
+   }
+}
