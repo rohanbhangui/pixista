@@ -33,6 +33,8 @@ Session.setDefault("disabledLoadMore", "hidden");
 //reactive var for showing the big title overlay on top of images
 Template.generate.onCreated(function() {
   this.tagName = new ReactiveVar("");
+
+
 });
 
 
