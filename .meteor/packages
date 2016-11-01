@@ -26,3 +26,4 @@ lbee:moment-helpers
 random@1.0.10
 twbs:bootstrap
 tsega:bootstrap3-datetimepicker
+autopublish
